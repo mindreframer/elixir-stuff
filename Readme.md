@@ -21,3 +21,7 @@ Resources:
   - http://www.aosabook.org/en/riak.html
   - http://joearms.github.io/archive.html
   - https://github.com/zkessin/testing-erlang-book.git
+
+
+Articles:
+  - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
