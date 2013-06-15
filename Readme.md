@@ -25,3 +25,36 @@ Resources:
 
 Articles:
   - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
+<!-- PROJECTS_LIST_START -->
+    ekosz/bitcoin_arbitrage:
+      Find arbitrage opportunities in the MtGox bitcoin market
+       24 commits, 18 stars, 4 forks
+
+    ekosz/stock_server:
+      The specs for the stock server for the 8th Light stock trading competition
+       14 commits, 0 stars, 0 forks
+
+    jeremyjh/nested:
+      Functions for manipulating nested hierarchies in Elixir - inspired by Clojure's assoc-in/update-in functions.
+       28 commits, 8 stars, 0 forks
+
+    josephwilk/amrita:
+      A polite, well mannered and thoroughly upstanding testing framework for Elixir
+       167 commits, 12 stars, 0 forks
+
+    sasa1977/elixir_websocket:
+      simple Elixir websocket example
+       16 commits, 1 stars, 0 forks
+
+    sasa1977/exactor:
+      Helpers for easier implementation of actors in Elixir
+       51 commits, 12 stars, 3 forks
+
+    sasa1977/workex:
+      Control over message receiving and processing in elixir workers.
+       21 commits, 1 stars, 0 forks
+
+    yrashk/genx:
+      Elixir-style library for most important OTP functionality
+       59 commits, 25 stars, 5 forks
+<!-- PROJECTS_LIST_END -->
