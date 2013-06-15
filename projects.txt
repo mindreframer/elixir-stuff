@@ -1,3 +1,4 @@
+https://github.com/azukiapp/plowman.git
 https://github.com/baldmountain/yahoo_finance.git
 https://github.com/edgurgel/octokit.ex.git
 https://github.com/edgurgel/poxa.git
