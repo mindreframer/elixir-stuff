@@ -1,0 +1,284 @@
+[appendix]
+[[APPENDIXB]]
+A Brief Introduction to Regular Expressions
+-------------------------------------------
+
+If there's one thing that humans do well, it's recognizing patterns. Most people from the United States can categorize the numbers in the following list as a social security number, a phone number, a date, and a postal code.
+
+----
+321-40-0909
+302-555-8754
+3-15-66
+95124-0448
+----
+
+You can tell at a glance which of the following words can't possibly be valid English words by the pattern of consonants and vowels:
+
+----
+grunion vortenal pskov trebular elibm talus
+----
+
+Regular expressions are Elixir's method of letting your program look for patterns; for example,
+
+* A fraction is a series of digits followed by a slash, followed by another series of digits.
+* A valid name consists of a series of letters, a comma followed by zero or more spaces, followed by another series of letters.
+
+The Simplest Patterns
+~~~~~~~~~~~~~~~~~~~~~
+
+Throughout this tutorial you'll be using the +Regex.match?/2+ function. Its
+first argument is a regular expression pattern, and the second argument is
+the string you want to test against. If the pattern matches the string, the
+function returns +true+; otherwise it returns +false+.
+
+To create a pattern, you use the string sigil +%r+ followed by the pattern, enclosed in slashes.  Here is an IEx session that tests to see if the string +"hello"+ contains the letter +e+, and then tests to see if it contains the letter +u+.
+
+// [source,iex]
+----
+iex(1)> Regex.match?(%r/e/, "hello")
+true
+iex(2)> Regex.match?(%r/u/, "hello")
+false
+----
+
+A pattern match will find the pattern if it exists anywhere within the string; you will find out how to change that behavior later on.
+
+[NOTE]
+=====
+If your pattern contains many slashes, you can use another character
+as the delimiter, or you may use +{+ and +}+.
+
+// [source, iex]
+----
+iex(1)> Regex.match?(%r!e!, "hello")
+true
+iex(2)> Regex.match?(%r{u}, "hello")
+false
+----
+=====
+
+Of course, you can put more than one letter in your pattern. You can look for the word eat anywhere in a word:
+
+----
+Regex.match?(%r/eat/, "some string")
+----
+
+
+This will return +true+ for the strings +"eat"+, +"heater"+, and +"treat"+, but won't match +"easy"+, +"metal"+, or +"hat"+. (Try it in IEx and find out for yourself if you don't believe me!)
+
+Matching Sets of Characters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+What if you wanted to find the letter +b+, followed by a vowel, followed by the letter +g+? (This would match the words bag, beg, big, bog, and bug.) You can specify a set of characters to match by putting them in square brackets. This is also called a _character class_.
+
+// [source, iex]
+----
+iex(1)> pattern = %r/b[aeiou]g/
+%r"b[aeiou]g"
+iex(2)> Regex.match?(pattern, "in the bag")
+true
+iex(3)> Regex.match?(pattern, "bogs and swamps")
+true
+iex(4)> Regex.match?(pattern, "debugger")
+true
+iex(5)> Regex.match?(pattern, "beagle")
+false
+----
+
+Line 1 shows that you can put a pattern into a variable. Line 5 doesn't match because there are two vowels between the +b+ and +g+, and a set of characters in square brackets means "match any *one* of these characters. You'll find out how to check for multiple vowels later.
+
+There are abbreviations for specifying a series of letters: +[a-f+] is the same as +[abcdef]+; +[A-Gm-p]+ is the same as +[ABCDEFGmnop]+; +[0-9]+ matches a single digit (same as +[0123456789]+).
+
+[NOTE]
+====
+If you want a hyphen to be one of the characters in your class, then it must be the first or last item in the brackets. For example, if you wanted a set that matched a comma, hyphen, or semicolon, you would have to write it as either +[-,;]+ or +[,;-]+
+=====
+
+You may also complement (negate) a class; the first pattern will look for the letter +e+ followed by anything except a vowel, followed by the letter +t+; the second pattern looks for any character except a capital letter:
+
+// [source, iex]
+----
+iex(1)> pattern1 = %r/e[^aeiou]t/
+%r"e[^aeiou]t"
+iex(2)> pattern2 = %r/[^A-Z]/
+%r"[^A-Z]"
+iex(4)> Regex.match?(pattern1, "ext")
+true
+iex(5)> Regex.match?(pattern1, "e9t")
+true
+iex(6)> Regex.match?(pattern1, "e t")
+true
+iex(7)> Regex.match?(pattern1, "eat")
+false
+iex(8)> Regex.match?(pattern2, "h") 
+true
+iex(9)> Regex.match?(pattern2, "HELLO")
+false
+----
+
+There are some character classes that are so useful that Elixir provides quick and easy abbrevations:
+
+.Character Class Abbreviations
+[options="header",cols="<15%,<15%,<70%"]
+|=======================
+|Abbreviation|Same as|Means
+|+\d+|+[0-9]+|digit
+|+\w+|+[A-Za-z0-9_]+|"word" character: upper case letter, lower case letter, digit, or underscore
+|+\s+|+[ \r\t\n\f]+|whitespace (blank, newline, tab, and others)
+|=======================
+
+The +\w+ class is better described as a set of characters that can be part of a variable name, not just a "word," but we can live with that.
+
+Each of these abbreviations has a complement:
+
+.Complementary Character Class Abbreviations
+[options="header",cols="<15%,<15%,<70%"]
+|=======================
+|Abbreviation|Same as|Means
+|+\D+|+[^0-9]+|non-digit
+|+\W+|+[^A-Za-z0-9_]+|non-"word" character: upper case letter, lower case letter, digit, or underscore
+|+\S+|+[^ \r\t\n\f]+|non-whitespace (blank, newline, tab, and others)
+|=======================
+
+The following pattern matches a U.S. Social Security number; again, we'll see a shorter way later on.
+
+// [source, elixir]
+----
+%r/\d\d\d-\d\d-\d\d\d\d/
+----
+
+Finally, there is one more special character: +.+ (a period), which matches any single character at all; letter, number, punctuation mark, whitespace--anything.
+
+Anchors
+~~~~~~~
+
+All the patterns you've seen so far will find a match anywhere within a string, which is usually--but not always--what you want. For example, you might insist on a capital letter, but only as the very first character in the string. Or, you might say that an employee ID number has to end with a digit. Or, you might want to find the word +go+ only if it is at the beginning of a word, so that you will find it in +I must be going+, but you won't mistakenly find it in +Long ago and far away+. This is the purpose of an _anchor_; to make sure that you are at a certain boundary before continuing the match. Unlike character classes, which match individual characters in a string, these anchors do not match any character; they simply establish that you are on the correct boundaries.
+
+The up-arrow `^` matches the beginning of a string, and the dollar sign `$` matches the end of a string. Thus, `^[A-Z]` matches a capital letter at the beginning of the string. Note that if you put the `^` inside the square brackets, that would mean something entirely different! A pattern +\d$+ matches a digit at the end of a line. These are the boundaries you will use most often.
+
+The other two anchors are +\b+ and +\B+, which stand for a "word boundary" and "non-word boundary." For example, if you want to find the word +met+ at the beginning of a word, use the pattern +%r/\bmet/+:
+
+// [source,iex]
+----
+iex(1)> Regex.match?(%r/\bmet/, "The metal plate")
+true
+iex(2)> Regex.match?(%r/\bmet/, "Our metropolitan life")
+true
+iex(3)> Regex.match?(%r/\bmet/, "Wear your helmet when bicycling")
+false
+----
+
+The pattern +%r/ing\b/+ matches +ing+ at the end of a word:
+
+// [source,iex]
+----
+iex(1)> Regex.match?(%r/ing\b/, "Hiking is fun")
+true
+iex(2)> Regex.match?(%r/ing\b/, "Reading, writing, and math")
+true
+iex(3)> Regex.match?(%r/ing\b/, "Gold ingots are heavy")
+false
+----
+
+Finally,the pattern +%r/\bhat\b/+ matches only +hat+, but not +that+
+or +hats+:
+
+// [source,iex]
+----
+iex(1)> Regex.match?(%r/\bhat\b/, "The hat is red")
+true
+iex(2)> Regex.match?(%r/\bhat\b/, "I saw that coming")
+false
+iex(3)> Regex.match?(%r/\bhat\b/, "The hats are red")
+false
+----
+
+While +\b+ is used to find the breakpoint between words and non-words (defined as a transition from a +\w+ character to a +\W+ character), \B finds pairs of letters or nonletters. The patterns +%r/\Bmet/+, +%r/ing\B/+; and +/\Bhat\B/+ will give the opposite results of the preceding examples.
+
+Repetition
+~~~~~~~~~~~
+
+All of these classes match only one character. What if you want to match three digits in a row, or an arbitrary number of vowels? You can follow any class or character by a repetition count:
+
+.Examples of repetition counts
+[options="header",cols="<15%,<85%"]
+|=============================
+|Pattern|Matches
+|+%r/b[aeiou]\{2\}t/+|+b+ followed by two vowels, followed by +t+
+|+%r/A\d{3,}/+|The letter +A+ followed by 3 or more digits
+|+%r/[A-Z]{,5}/+|Zero to five capital letters
+|+%r/\w{3,7}/+|Three to seven word characters
+|=============================
+
+This lets you rewrite the social security number pattern match as +%r/\d\{3\}-\d\{2\}-\d\{4\}/+.
+
+There are three repetitions that are so common that Elixir has special symbols for them: +*+ means "zero or more," +++ means "one or more," and +?+ means "zero or one". If you wanted to look for lines consisting of last names followed by a first initial, you could use the following pattern:
+
+// [source,elixir]
+----
+%r/^\w+,?\s*[A-Z]$/
+----
+
+This matches:
+
+ * starting at the beginning of the string (+^+)
+ * a word of one or more characters (+\w++)
+ * followed by zero or one commas -- that is, an optional comma (+,?+)
+ * zero or more whitespace characters (+\s*+),
+ * and a single capital letter (+[A-Z]+),
+ * which must be at the end of the string (+$+)
+
+Here it is in action:
+
+// [source,iex]
+----
+iex(1)> pattern = %r/^\w+,?\s*[A-Z]$/
+%r"^\\w+,?\\s*[A-Z]$"
+iex(2)> Regex.match?(pattern, "Smith, J")
+true
+iex(3)> Regex.match?(pattern, "Jimenez R")
+true
+iex(4)> Regex.match?(pattern, "Nguyen,H")
+true
+----
+
+So far so good, but what if we want to scan for a last name, followed by an optional comma-whitespace-initial; thus matching people who are known only by a single name like "Michelangelo" or a full "Smith, J"? We need to put the comma, whitespace, and initial into a unit with parentheses and then follow that with a +?+ to make the entire group optional.
+
+// [source,elixir]
+----
+%r/^\w+(,\s*[A-Z])?$/
+----
+
+And here it is in action:
+
+// [source, iex]
+----
+iex(1)> pattern2 = %r/^\w+(,\s*[A-Z])?$/
+%r"^\\w+(,\\s*[A-Z])?$"
+iex(2)> Regex.match?(pattern2, "Michelangelo")
+true
+iex(3)> Regex.match?(pattern2, "Buonarotti, M")
+true
+----
+
+[NOTE]
+====
+If you want to match any of the special characters in a pattern, you must preced them with a backslash. For example, if you wanted to look for an upper case letter followed by a period, you would need to write the pattern as
+
+// [source,elixir]
+----
+%r/[A-Z]\./
+----
+====
+
+
+If you want a pattern match to be case-insenstive, follow the closing delimiter of the pattern by a lowercase letter i. The following example shows a pattern that will match any Canadian postal code in upper or lower case:
+
+// [source,elixir]
+----
+%r/^[A-Z]\d[A-Z]\s+\d[A-Z]\d$/i
+----
+
+This necessarily brief introduction to regular expressions has only touched the surface of their power. Nonetheless, you now enough to do most simple and even some fairly sophisticated pattern matching. If you want to learn more about regular expressions, read http://shop.oreilly.com/product/0636920012337.do[Introducing Regular Expressions].
+
+
