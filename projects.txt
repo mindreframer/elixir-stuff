@@ -7,6 +7,7 @@ https://github.com/jeremyjh/nested.git
 https://github.com/josephwilk/amrita.git
 https://github.com/meh/elixir-datastructures.git
 https://github.com/myfreeweb/httpotion.git
+https://github.com/oslampa/99Problems.git
 https://github.com/oreillymedia/etudes-for-elixir.git
 https://github.com/talentdeficit/jsex.git
 https://github.com/sasa1977/elixir_websocket.git
