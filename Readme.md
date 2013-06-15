@@ -27,6 +27,18 @@ Articles:
   - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
 
 <!-- PROJECTS_LIST_START -->
+    baldmountain/yahoo_finance:
+      An Elixir module to retrieve Yahoo Finance quotes
+       13 commits, 2 stars, 0 forks
+
+    edgurgel/octokit.ex:
+      Simple Elixir wrapper for the GitHub API
+       2 commits, 3 stars, 0 forks
+
+    edgurgel/poxa:
+      Open Pusher server implementation compatible with Pusher libraries.
+       17 commits, 7 stars, 1 forks
+
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
        24 commits, 18 stars, 4 forks
@@ -42,6 +54,26 @@ Articles:
     josephwilk/amrita:
       A polite, well mannered and thoroughly upstanding testing framework for Elixir
        167 commits, 12 stars, 0 forks
+
+    meh/elixir-datastructures:
+      Datastructures for Elixir.
+       56 commits, 2 stars, 0 forks
+
+    myfreeweb/httpotion:
+      The HTTP client for Elixir
+       23 commits, 28 stars, 4 forks
+
+    oslampa/99Problems:
+      Solutions to 99 problems list in Elixir.
+       15 commits, 0 stars, 0 forks
+
+    oreillymedia/etudes-for-elixir:
+      Companion exercises for Introducing Elixir
+       65 commits, 2 stars, 0 forks
+
+    talentdeficit/jsex:
+      json for elixir
+       80 commits, 17 stars, 2 forks
 
     sasa1977/elixir_websocket:
       simple Elixir websocket example
