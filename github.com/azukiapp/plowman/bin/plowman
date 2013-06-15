@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Getting the path of the project
+
+__FILE__="${0}"
+export PLOWMAN_ROOT=`cd \`dirname $(readlink ${__FILE__} || echo ${__FILE__} )\`/..; pwd`
+cd $PLOWMAN_ROOT
+
+export PATH="${PLOWMAN_ROOT}/bin:${PLOWMAN_ROOT}/deps/elixir/bin:$PATH"
+
+if ! which elixir 2> /dev/null > /dev/null; then
+  echo "Elixir not found."
+  echo "Try: make or install from (http://elixir-lang.org)."
+  exit 1
+fi
+
+if [ -z $1 ]; then
+  elixir --no-halt -S mix run
+else
+  $@
+fi
