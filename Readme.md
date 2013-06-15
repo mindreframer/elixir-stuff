@@ -27,6 +27,10 @@ Articles:
   - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
 
 <!-- PROJECTS_LIST_START -->
+    azukiapp/plowman:
+      Alternative to Git Server for Openruko - Elixir/Erlang based
+       37 commits, 2 stars, 0 forks
+
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
        13 commits, 2 stars, 0 forks
