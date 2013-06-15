@@ -25,6 +25,7 @@ Resources:
 
 Articles:
   - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
+
 <!-- PROJECTS_LIST_START -->
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
