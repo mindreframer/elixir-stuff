@@ -47,6 +47,10 @@ Articles:
       Open Pusher server implementation compatible with Pusher libraries.
        17 commits, 7 stars, 1 forks
 
+    elixir-lang/dynamo:
+      Run, Dynamo, Run!
+       468 commits, 267 stars, 47 forks
+
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
        24 commits, 18 stars, 4 forks
