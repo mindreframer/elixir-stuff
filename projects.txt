@@ -3,6 +3,7 @@ https://github.com/baldmountain/elixir_csv.git
 https://github.com/baldmountain/yahoo_finance.git
 https://github.com/edgurgel/octokit.ex.git
 https://github.com/edgurgel/poxa.git
+https://github.com/elixir-lang/dynamo.git
 https://github.com/ekosz/bitcoin_arbitrage.git
 https://github.com/ekosz/stock_server.git
 https://github.com/jeremyjh/nested.git
