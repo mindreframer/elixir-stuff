@@ -31,6 +31,10 @@ Articles:
       Alternative to Git Server for Openruko - Elixir/Erlang based
        37 commits, 2 stars, 0 forks
 
+    baldmountain/elixir_csv:
+
+       16 commits, 1 stars, 1 forks
+
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
        13 commits, 2 stars, 0 forks
