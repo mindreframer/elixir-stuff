@@ -33,7 +33,7 @@ Articles:
 
     baldmountain/elixir_csv:
 
-       16 commits, 1 stars, 1 forks
+       16 commits, 2 stars, 1 forks
 
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
@@ -41,7 +41,7 @@ Articles:
 
     edgurgel/octokit.ex:
       Simple Elixir wrapper for the GitHub API
-       2 commits, 3 stars, 0 forks
+       12 commits, 5 stars, 0 forks
 
     edgurgel/poxa:
       Open Pusher server implementation compatible with Pusher libraries.
@@ -65,23 +65,23 @@ Articles:
 
     josephwilk/amrita:
       A polite, well mannered and thoroughly upstanding testing framework for Elixir
-       167 commits, 12 stars, 0 forks
+       167 commits, 13 stars, 0 forks
 
     meh/elixir-datastructures:
       Datastructures for Elixir.
-       56 commits, 2 stars, 0 forks
+       57 commits, 2 stars, 0 forks
 
     myfreeweb/httpotion:
       The HTTP client for Elixir
-       23 commits, 28 stars, 4 forks
+       25 commits, 30 stars, 5 forks
 
     oslampa/99Problems:
       Solutions to 99 problems list in Elixir.
-       15 commits, 0 stars, 0 forks
+       15 commits, 1 stars, 0 forks
 
     oreillymedia/etudes-for-elixir:
       Companion exercises for Introducing Elixir
-       65 commits, 2 stars, 0 forks
+       65 commits, 4 stars, 0 forks
 
     talentdeficit/jsex:
       json for elixir
