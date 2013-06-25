@@ -37,19 +37,19 @@ Articles:
 
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
-       14 commits, 2 stars, 0 forks
+       14 commits, 3 stars, 0 forks
 
     edgurgel/octokit.ex:
       Simple Elixir wrapper for the GitHub API
-       20 commits, 5 stars, 0 forks
+       37 commits, 6 stars, 2 forks
 
     edgurgel/poxa:
       Open Pusher server implementation compatible with Pusher libraries.
-       17 commits, 7 stars, 1 forks
+       18 commits, 8 stars, 1 forks
 
     elixir-lang/dynamo:
       Run, Dynamo, Run!
-       468 commits, 270 stars, 48 forks
+       472 commits, 287 stars, 54 forks
 
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
@@ -65,7 +65,7 @@ Articles:
 
     josephwilk/amrita:
       A polite, well mannered and thoroughly upstanding testing framework for Elixir:
-       167 commits, 13 stars, 0 forks
+       236 commits, 16 stars, 2 forks
 
     meh/elixir-datastructures:
       Datastructures for Elixir.
@@ -73,11 +73,11 @@ Articles:
 
     myfreeweb/httpotion:
       The HTTP client for Elixir
-       25 commits, 31 stars, 5 forks
+       26 commits, 35 stars, 5 forks
 
     oslampa/99Problems:
       Solutions to 99 problems list in Elixir.
-       15 commits, 1 stars, 0 forks
+       16 commits, 1 stars, 0 forks
 
     oreillymedia/etudes-for-elixir:
       Companion exercises for Introducing Elixir
@@ -93,13 +93,13 @@ Articles:
 
     sasa1977/exactor:
       Helpers for easier implementation of actors in Elixir
-       51 commits, 12 stars, 3 forks
+       51 commits, 14 stars, 3 forks
 
     sasa1977/workex:
       Control over message receiving and processing in elixir workers.
-       21 commits, 1 stars, 0 forks
+       22 commits, 1 stars, 0 forks
 
     yrashk/genx:
       Elixir-style library for most important OTP functionality
-       59 commits, 25 stars, 5 forks
+       61 commits, 25 stars, 5 forks
 <!-- PROJECTS_LIST_END -->
