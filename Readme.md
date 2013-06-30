@@ -37,15 +37,15 @@ Articles:
 
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
-       14 commits, 3 stars, 0 forks
+       16 commits, 3 stars, 0 forks
 
     edgurgel/octokit.ex:
       Simple Elixir wrapper for the GitHub API
-       37 commits, 6 stars, 2 forks
+       43 commits, 6 stars, 2 forks
 
     edgurgel/poxa:
       Open Pusher server implementation compatible with Pusher libraries.
-       18 commits, 8 stars, 1 forks
+       19 commits, 8 stars, 1 forks
 
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
@@ -57,7 +57,7 @@ Articles:
 
     elixir-lang/dynamo:
       Run, Dynamo, Run!
-       472 commits, 287 stars, 54 forks
+       472 commits, 307 stars, 54 forks
 
     jeremyjh/nested:
       Functions for manipulating nested hierarchies in Elixir - inspired by Clojure's assoc-in/update-in functions.
@@ -65,19 +65,19 @@ Articles:
 
     josephwilk/amrita:
       A polite, well mannered and thoroughly upstanding testing framework for Elixir:
-       236 commits, 16 stars, 2 forks
+       244 commits, 24 stars, 3 forks
 
     meh/elixir-datastructures:
       Datastructures for Elixir.
-       57 commits, 2 stars, 0 forks
+       62 commits, 2 stars, 0 forks
 
     myfreeweb/httpotion:
       The HTTP client for Elixir
-       26 commits, 35 stars, 5 forks
+       26 commits, 38 stars, 5 forks
 
     oreillymedia/etudes-for-elixir:
       Companion exercises for Introducing Elixir
-       65 commits, 5 stars, 0 forks
+       65 commits, 10 stars, 1 forks
 
     oslampa/99Problems:
       Solutions to 99 problems list in Elixir.
@@ -93,13 +93,13 @@ Articles:
 
     sasa1977/workex:
       Control over message receiving and processing in elixir workers.
-       22 commits, 1 stars, 0 forks
+       22 commits, 2 stars, 0 forks
 
     talentdeficit/jsex:
       json for elixir
-       80 commits, 17 stars, 2 forks
+       80 commits, 18 stars, 2 forks
 
     yrashk/genx:
       Elixir-style library for most important OTP functionality
-       61 commits, 25 stars, 5 forks
+       61 commits, 26 stars, 6 forks
 <!-- PROJECTS_LIST_END -->
