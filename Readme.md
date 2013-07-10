@@ -29,7 +29,7 @@ Articles:
 <!-- PROJECTS_LIST_START -->
     azukiapp/plowman:
       Alternative to Git Server for Openruko - Elixir/Erlang based
-       37 commits, last change: 2013-05-28 04:01:00, 2 stars, 0 forks
+       37 commits, last change: , 2 stars, 0 forks
 
     baldmountain/elixir_csv:
 
@@ -37,15 +37,15 @@ Articles:
 
     baldmountain/yahoo_finance:
       An Elixir module to retrieve Yahoo Finance quotes
-       16 commits, last change: , 3 stars, 0 forks
+       19 commits, last change: , 3 stars, 0 forks
 
     edgurgel/octokit.ex:
       Simple Elixir wrapper for the GitHub API
-       43 commits, last change: 2013-06-28 15:09:31, 6 stars, 2 forks
+       46 commits, last change: 2013-07-06 12:31:52, 6 stars, 2 forks
 
     edgurgel/poxa:
       Open Pusher server implementation compatible with Pusher libraries.
-       28 commits, last change: 2013-06-30 19:32:57, 8 stars, 1 forks
+       34 commits, last change: 2013-07-09 18:10:28, 8 stars, 1 forks
 
     ekosz/bitcoin_arbitrage:
       Find arbitrage opportunities in the MtGox bitcoin market
@@ -53,11 +53,11 @@ Articles:
 
     ekosz/stock_server:
       The specs for the stock server for the 8th Light stock trading competition
-       14 commits, last change: 2013-03-20 20:02:49, 0 stars, 0 forks
+       14 commits, last change: , 0 stars, 0 forks
 
     elixir-lang/dynamo:
       Run, Dynamo, Run!
-       472 commits, last change: 2013-06-24 12:18:54, 311 stars, 55 forks
+       488 commits, last change: 2013-07-08 05:27:52, 322 stars, 60 forks
 
     jeremyjh/nested:
       Functions for manipulating nested hierarchies in Elixir - inspired by Clojure's assoc-in/update-in functions.
@@ -65,19 +65,19 @@ Articles:
 
     josephwilk/amrita:
       A polite, well mannered and thoroughly upstanding testing framework for Elixir:
-       269 commits, last change: 2013-07-02 11:08:32, 26 stars, 3 forks
+       323 commits, last change: 2013-07-10 03:11:57, 30 stars, 4 forks
 
     meh/elixir-datastructures:
       Datastructures for Elixir.
-       69 commits, last change: 2013-07-01 04:43:27, 2 stars, 1 forks
+       71 commits, last change: 2013-07-08 05:02:03, 3 stars, 1 forks
 
     myfreeweb/httpotion:
       The HTTP client for Elixir
-       26 commits, last change: 2013-06-23 10:34:44, 38 stars, 5 forks
+       34 commits, last change: 2013-07-06 09:45:31, 43 stars, 5 forks
 
     oreillymedia/etudes-for-elixir:
       Companion exercises for Introducing Elixir
-       67 commits, last change: 2013-07-02 10:45:00, 13 stars, 2 forks
+       77 commits, last change: 2013-07-09 09:00:45, 18 stars, 5 forks
 
     oslampa/99Problems:
       Solutions to 99 problems list in Elixir.
@@ -85,7 +85,7 @@ Articles:
 
     sasa1977/elixir_websocket:
       simple Elixir websocket example
-       16 commits, last change: 2013-05-23 11:40:10, 1 stars, 0 forks
+       16 commits, last change: , 1 stars, 0 forks
 
     sasa1977/exactor:
       Helpers for easier implementation of actors in Elixir
@@ -97,9 +97,9 @@ Articles:
 
     talentdeficit/jsex:
       json for elixir
-       82 commits, last change: 2013-07-01 18:33:56, 19 stars, 3 forks
+       82 commits, last change: 2013-07-01 18:33:56, 21 stars, 3 forks
 
     yrashk/genx:
       Elixir-style library for most important OTP functionality
-       61 commits, last change: 2013-06-23 03:40:02, 26 stars, 6 forks
+       62 commits, last change: 2013-07-07 13:02:26, 27 stars, 6 forks
 <!-- PROJECTS_LIST_END -->
