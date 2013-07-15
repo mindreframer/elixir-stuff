@@ -40,6 +40,12 @@ defmodule YahooFinance do
     adjClose: 0.0,
     recno: nil
 
+  defimpl Binary.Chars, for: HistoricalQuote do
+    def to_binary(q) do
+      "symbol: #{q.symbol} date: #{q.date} open: #{float_to_binary(q.open, [decimals: 2])} high: #{float_to_binary(q.high, [decimals: 2])} low: #{float_to_binary(q.low, [decimals: 2])} close: #{float_to_binary(q.close, [decimals: 2])} volume: #{q.volume} adjClose: #{float_to_binary(q.adjClose, [decimals: 2])}"
+    end
+  end
+
   @doc """
   A record returned by get_standard_quotes or get_realtime_quotes. Not all
   fields are filled in. Only some of the fields are filled in for a real
@@ -74,7 +80,6 @@ defmodule YahooFinance do
     @doc "functionality for all quote types"
     def initialize(q, hash, valarray)
     def valid?(q)
-    def as_string(q)
   end
 
   def to_float(value) do
@@ -107,10 +112,6 @@ defmodule YahooFinance do
 
     def valid?(q) do
       q.symbol != nil
-    end
-
-    def as_string(q) do
-      "#HistoricalQuote symbol: #{q.symbol}"
     end
   end
 
@@ -158,10 +159,6 @@ defmodule YahooFinance do
         _ -> q.name != q.symbol
       end
     end
-
-    def as_string(q) do
-      "#StockQuote symbol: #{q.symbol} name: #{q.name}"
-    end
   end
 
   @doc """
@@ -176,15 +173,16 @@ defmodule YahooFinance do
       true ->
         ""
     end
-    response = cond do
+    {:ok, {{_,status,_},_,content}} = cond do
       size(symbols)  > 0 ->
-        HTTPotion.get("http://download.finance.yahoo.com/d/quotes.csv?s=#{symbols}&f=#{format}&e=.csv", [], [timeout: timeout])
+        :httpc.request(:get, {'http://download.finance.yahoo.com/d/quotes.csv?s=#{symbols}&f=#{format}&e=.csv', []}, [{:timeout, timeout}], [])
+        # HTTPotion.get("http://download.finance.yahoo.com/d/quotes.csv?s=#{symbols}&f=#{format}&e=.csv", [], [timeout: timeout])
       true ->
-        ""
+        {:ok, {{"",404,""}, "", ""}}
     end
-    case response.status_code do
+    case status do
       200 ->
-        String.strip(response.body)
+        String.strip(list_to_binary(content))
       true ->
         ""
     end
@@ -242,20 +240,20 @@ defmodule YahooFinance do
   zero.
   """
   def get_historical_quotes_using_dates(symbol, start_date, end_date, timeout // @default_read_timeout) do
-    cond do
-      {{sy,sm,sd},{_,_,_}} = start_date -> :ok
-      {sy,sm,sd} = start_date -> :ok
+    case tuple_size(start_date) do
+      2 -> {{sy,sm,sd},{_,_,_}} = start_date
+      3 -> {sy,sm,sd} = start_date
     end
-    cond do
-      {{ey,em,ed},{_,_,_}} = end_date -> :ok
-      {ey,em,ed} = end_date -> :ok
+    case tuple_size(start_date) do
+      2 -> {{ey,em,ed},{_,_,_}} = end_date
+      3 -> {ey,em,ed} = end_date
     end
-    query = "http://itable.finance.yahoo.com/table.csv?s=#{symbol}&g=d&a=#{sm-1}&b=#{sd}&c=#{sy}&d=#{em-1}&e=#{ed}&f=#{ey}"
+    query = 'http://itable.finance.yahoo.com/table.csv?s=#{symbol}&g=d&a=#{sm-1}&b=#{sd}&c=#{sy}&d=#{em-1}&e=#{ed}&f=#{ey}'
 
-    response = HTTPotion.get(query, [], [timeout: timeout])
+    {:ok, {{_, status,_},_,content}} = :httpc.request(:get, {query, []}, [{:timeout, timeout}], [])
     cond do
-      response.status_code in 200..299 ->
-        response.body
+      status in 200..299 ->
+        list_to_binary(content)
         |> CSV.parse(",", "\"", 1)
         |> Enum.map(fn(row) ->
           YahooFinance.HistoricalQuote.new |> YahooFinance.BaseQuote.initialize symbol, row
