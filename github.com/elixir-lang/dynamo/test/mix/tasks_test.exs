@@ -36,7 +36,7 @@ defmodule Mix.TasksTest do
 
       output = System.cmd "mix dynamo.filters"
       assert output =~ %r(filter Dynamo.Filters.Head)
-      assert output =~ %r(filter \{Dynamo.Filters.Loader,true,true\})
+      assert output =~ %r(filter \{Dynamo.Filters.Loader, *true, *true\})
       assert output =~ %r(ApplicationRouter.service/1)
 
       # Check it works with first compilation in prod
@@ -55,7 +55,7 @@ defmodule Mix.TasksTest do
     in_tmp "my_run_app", fn ->
       app_with_dynamo_deps_path
 
-      output = System.cmd %b{mix run "IO.inspect HelloRouter.__info__(:module)"}
+      output = System.cmd %b{mix run -e "IO.inspect HelloRouter.__info__(:module)"}
       assert output =~ %r(HelloRouter)
 
       # TODO: Get rid of this
@@ -90,7 +90,7 @@ defmodule Mix.TasksTest do
   test "warns on missing dependencies" do
     in_tmp "missing_deps", fn ->
       Mix.Tasks.Dynamo.run [".", "--dev"]
-      error = %r(Some dependencies are out of date)
+      error = %r(Can't continue due to errors on dependencies)
 
       output = System.cmd "mix server"
       assert output =~ error

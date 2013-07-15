@@ -119,7 +119,7 @@ defmodule Dynamo do
 
     setup =
       quote do
-        if @dynamo_router do
+        if Module.get_attribute(__MODULE__, :dynamo_router) do
           raise "Dynamo needs to be used before Dynamo.Router"
         end
 
@@ -235,7 +235,7 @@ defmodule Dynamo do
     env = dynamo[:env]
     if dir && File.dir?(dir) do
       file = "#{dir}/#{env}.exs"
-      Code.string_to_ast! File.read!(file), file: file
+      Code.string_to_quoted! File.read!(file), file: file
     end
   end
 
