@@ -14,7 +14,7 @@ defmodule Data.Stack.Simple do
   @opaque t :: record
   @type   v :: any
 
-  defrecordp :stack, list: []
+  defrecordp :stack, __MODULE__, list: []
 
   @doc """
   Creates an empty stack.
@@ -76,19 +76,19 @@ defmodule Data.Stack.Simple do
   end
 
   @doc """
-  Pop a value from the stack, raising if its empty.
+  Pop a value from the stack, raising if it's empty.
 
   ## Examples
 
       iex> Data.Stack.Simple.new |> Stack.push(42) |> Stack.pop
       {42,#Stack<[]>}
       iex> Data.Stack.Simple.new |> Stack.pop!
-      ** (Stack.Empty) the queue is empty
+      ** (Data.Empty) the queue is empty
 
   """
   @spec pop!(t) :: { v, t } | no_return
   def pop!(stack(list: [])) do
-    raise Stack.Empty
+    raise Data.Empty
   end
 
   def pop!(stack() = self) do
@@ -126,12 +126,12 @@ defmodule Data.Stack.Simple do
       iex> Data.Stack.Simple.new |> Stack.push(42) |> Stack.push(23) |> Stack.peek!
       23
       iex> Data.Stack.Simple.new |> Stack.peek!
-      ** (Stack.Empty) the stack is empty
+      ** (Data.Empty) the stack is empty
 
   """
   @spec peek!(t) :: v | no_return
   def peek!(stack(list: [])) do
-    raise Stack.Empty
+    raise Data.Empty
   end
 
   def peek!(stack) do
@@ -169,7 +169,7 @@ defmodule Data.Stack.Simple do
   end
 
   @doc """
-  Check if the the value is present in the stack.
+  Check if the value is present in the stack.
   """
   @spec member?(t, v) :: boolean
   def member?(stack(list: []), _) do
@@ -261,8 +261,14 @@ defimpl Data.Contains, for: Data.Stack.Simple do
   defdelegate contains?(self, key), to: Data.Stack.Simple, as: :member?
 end
 
-defimpl Binary.Inspect, for: Data.Stack.Simple do
+defimpl Enumerable, for: Data.Stack.Simple do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Stack.Simple do
+  import Inspect.Algebra
+
   def inspect(stack, opts) do
-    "#Stack<" <> Kernel.inspect(Data.Stack.Simple.to_list(stack), opts) <> ">"
+    concat ["#Stack<", Kernel.inspect(Data.Stack.Simple.to_list(stack), opts), ">"]
   end
 end

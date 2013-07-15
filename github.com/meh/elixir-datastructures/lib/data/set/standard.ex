@@ -7,7 +7,7 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 defmodule Data.Set.Standard do
-  defrecordp :wrap, set: nil
+  defrecordp :wrap, __MODULE__, set: nil
 
   def new do
     wrap(set: :sets.new)
@@ -57,6 +57,14 @@ defmodule Data.Set.Standard do
     wrap(set: :sets.intersection(self, Data.to_list(other) |> :sets.from_list))
   end
 
+  def difference(wrap(set: self), wrap(set: other)) do
+    wrap(set: :sets.subtract(self, other))
+  end
+
+  def difference(wrap(set: self), other) do
+    wrap(set: :sets.subtract(self, Data.to_list(other) |> :sets.from_list))
+  end
+
   def subset?(wrap(set: self), wrap(set: other)) do
     :sets.is_subset(other, self)
   end
@@ -97,6 +105,7 @@ defimpl Data.Set, for: Data.Set.Standard do
   defdelegate delete(self, value), to: Data.Set.Standard
   defdelegate union(self, other), to: Data.Set.Standard
   defdelegate intersection(self, other), to: Data.Set.Standard
+  defdelegate difference(self, other), to: Data.Set.Standard
   defdelegate subset?(self, other), to: Data.Set.Standard
   defdelegate disjoint?(self, other), to: Data.Set.Standard
 end
@@ -146,8 +155,14 @@ defimpl Data.Sequence, for: Data.Set.Standard do
   end
 end
 
-defimpl Binary.Inspect, for: Data.Set.Standard do
+defimpl Enumerable, for: Data.Set.Standard do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Set.Standard do
+  import Inspect.Algebra
+
   def inspect(set, opts) do
-    "#Set<" <> Kernel.inspect(Data.Set.Standard.to_list(set), opts) <> ">"
+    concat ["#Set<", Kernel.inspect(Data.Set.Standard.to_list(set), opts), ">"]
   end
 end
