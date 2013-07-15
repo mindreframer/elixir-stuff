@@ -7,7 +7,7 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 defmodule Data.Dictionary.BalancedTree do
-  defrecordp :wrap, dict: nil
+  defrecordp :wrap, __MODULE__, dict: nil
 
   def new do
     wrap(dict: :gb_trees.empty)
@@ -167,8 +167,14 @@ defimpl Access, for: Data.Dictionary.BalancedTree do
   defdelegate access(self, key), to: Data.Dictionary.BalancedTree, as: :get
 end
 
-defimpl Binary.Inspect, for: Data.Dictionary.BalancedTree do
+defimpl Enumerable, for: Data.Dictionary.BalancedTree do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Dictionary.BalancedTree do
+  import Inspect.Algebra
+
   def inspect(self, opts) do
-    "#Dictionary<" <> Kernel.inspect(Data.Dictionary.BalancedTree.to_list(self), opts) <> ">"
+    concat ["#Dictionary<", Kernel.inspect(Data.Dictionary.BalancedTree.to_list(self), opts), ">"]
   end
 end

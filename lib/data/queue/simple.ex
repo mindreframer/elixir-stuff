@@ -14,7 +14,7 @@ defmodule Data.Queue.Simple do
   @opaque t :: record
   @type   v :: any
 
-  defrecordp :queue, enqueue: [], dequeue: []
+  defrecordp :queue, __MODULE__, enqueue: [], dequeue: []
 
   @doc """
   Creates an empty queue.
@@ -97,7 +97,7 @@ defmodule Data.Queue.Simple do
   end
 
   @doc """
-  Dequeue a value from the queue, raising if its empty.
+  Dequeue a value from the queue, raising if it's empty.
 
   ## Examples
 
@@ -283,8 +283,14 @@ defimpl Data.Contains, for: Data.Queue.Simple do
   defdelegate contains?(self, value), to: Data.Queue.Simple, as: :member?
 end
 
-defimpl Binary.Inspect, for: Data.Queue.Simple do
+defimpl Enumerable, for: Data.Queue.Simple do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Queue.Simple do
+  import Inspect.Algebra
+
   def inspect(queue, opts) do
-    "#Queue<" <> Kernel.inspect(Data.Queue.Simple.to_list(queue), opts) <> ">"
+    concat ["#Queue<", Kernel.inspect(Data.Queue.Simple.to_list(queue), opts), ">"]
   end
 end

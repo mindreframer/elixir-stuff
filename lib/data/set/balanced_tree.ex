@@ -10,7 +10,7 @@ defmodule Data.Set.BalancedTree do
   @opaque t :: record
   @type   v :: any
 
-  defrecordp :wrap, set: nil
+  defrecordp :wrap, __MODULE__, set: nil
 
   def new do
     wrap(set: :gb_sets.new)
@@ -60,6 +60,14 @@ defmodule Data.Set.BalancedTree do
     wrap(set: :gb_sets.intersection(self, Data.to_list(other) |> :gb_sets.from_list))
   end
 
+  def difference(wrap(set: self), wrap(set: other)) do
+    wrap(set: :gb_sets.subtract(self, other))
+  end
+
+  def difference(wrap(set: self), other) do
+    wrap(set: :gb_sets.subtract(self, Data.to_list(other) |> :gb_sets.from_list))
+  end
+
   def subset?(wrap(set: self), wrap(set: other)) do
     :gb_sets.is_subset(other, self)
   end
@@ -104,6 +112,7 @@ defimpl Data.Set, for: Data.Set.BalancedTree do
   defdelegate delete(self, value), to: Data.Set.BalancedTree
   defdelegate union(self, other), to: Data.Set.BalancedTree
   defdelegate intersection(self, other), to: Data.Set.BalancedTree
+  defdelegate difference(self, other), to: Data.Set.BalancedTree
   defdelegate subset?(self, other), to: Data.Set.BalancedTree
   defdelegate disjoint?(self, other), to: Data.Set.BalancedTree
 end
@@ -153,8 +162,14 @@ defimpl Data.Sequence, for: Data.Set.BalancedTree do
   end
 end
 
-defimpl Binary.Inspect, for: Data.Set.BalancedTree do
+defimpl Enumerable, for: Data.Set.BalancedTree do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Set.BalancedTree do
+  import Inspect.Algebra
+
   def inspect(set, opts) do
-    "#Set<" <> Kernel.inspect(Data.Set.BalancedTree.to_list(set), opts) <> ">"
+    concat ["#Set<", Kernel.inspect(Data.Set.BalancedTree.to_list(set), opts), ">"]
   end
 end

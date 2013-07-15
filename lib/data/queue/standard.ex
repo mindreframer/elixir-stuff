@@ -7,7 +7,7 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 defmodule Data.Queue.Standard do
-  defrecordp :wrap, queue: nil
+  defrecordp :wrap, __MODULE__, queue: nil
 
   def new do
     wrap(queue: :queue.new)
@@ -117,6 +117,10 @@ defmodule Data.Queue.Standard do
     :queue.is_empty(queue)
   end
 
+  def clear(_) do
+    new
+  end
+
   def member?(wrap(queue: queue), value) do
     :queue.member(value, queue)
   end
@@ -197,8 +201,14 @@ defimpl Data.Contains, for: Data.Queue.Standard do
   defdelegate contains?(self, key), to: Data.Queue.Standard, as: :member?
 end
 
-defimpl Binary.Inspect, for: Data.Queue.Standard do
+defimpl Enumerable, for: Data.Queue.Standard do
+  use Data.Enumerable
+end
+
+defimpl Inspect, for: Data.Queue.Standard do
+  import Inspect.Algebra
+
   def inspect(queue, opts) do
-    "#Queue<" <> Kernel.inspect(Data.Queue.Standard.to_list(queue), opts) <> ">"
+    concat ["#Queue<", Kernel.inspect(Data.Queue.Standard.to_list(queue), opts), ">"]
   end
 end

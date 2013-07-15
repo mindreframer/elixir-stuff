@@ -7,7 +7,7 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 defmodule Data.Dictionary.Standard do
-  defrecordp :wrap, dict: nil
+  defrecordp :wrap, __MODULE__, dict: nil
 
   def new do
     wrap(dict: :dict.new)
@@ -154,13 +154,18 @@ defimpl Data.Sequence, for: Data.Dictionary.Standard do
   end
 end
 
+defimpl Enumerable, for: Data.Dictionary.Standard do
+  use Data.Enumerable
+end
 
 defimpl Access, for: Data.Dictionary.Standard do
   defdelegate access(self, key), to: Data.Dictionary.Standard, as: :get
 end
 
-defimpl Binary.Inspect, for: Data.Dictionary.Standard do
+defimpl Inspect, for: Data.Dictionary.Standard do
+  import Inspect.Algebra
+
   def inspect(self, opts) do
-    "#Dictionary<" <> Kernel.inspect(Data.Dictionary.Standard.to_list(self), opts) <> ">"
+    concat ["#Dictionary<", Kernel.inspect(Data.Dictionary.Standard.to_list(self), opts), ">"]
   end
 end
