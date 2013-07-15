@@ -9,22 +9,26 @@ Open Pusher implementation compatible with Pusher libraries. It's designed to be
 * Private channels;
 * Presence channels;
 * Client events;
-* SSL on websocket and REST api;
+* SSL on websocket and REST API;
+* REST API
+  * /users on presence channels
+  * /channels/:channel_name (Partial support)
 
 ## TODO
 
+* SockJS support;
 * Complete REST api;
 * Mimic pusher error codes;
 * Simple console;
 * Integration test using pusher-js or other client library;
 * Web hooks;
-* Specify types signature to functions and use dyalizer to check them;
+* Specify types signature to functions and use dialyzer to check them;
 
 ## Typical usage
 
 Poxa is a standalone elixir server implementation of the Pusher protocol.
 
-You need [Elixir](http://elixir-lang.org) 0.9.0 at least and we need at least Erlang R16B.
+You need [Elixir](http://elixir-lang.org) 0.9.3 at least and Erlang R16B.
 
 Clone this repository
 

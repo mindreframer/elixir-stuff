@@ -39,8 +39,8 @@ defmodule Poxa.PresenceSubscription do
   end
 
   defp extract_userid_and_userinfo(channel_data) do
-    user_id = sanitize_user_id(ListDict.get(channel_data, "user_id"))
-    user_info = ListDict.get(channel_data, "user_info")
+    user_id = sanitize_user_id(channel_data["user_id"])
+    user_info = channel_data["user_info"]
     {user_id, user_info}
   end
 
@@ -53,6 +53,30 @@ defmodule Poxa.PresenceSubscription do
       _ -> nil
     end
     :ok
+  end
+
+  @doc """
+  This function returns the user ids currently subscribed to a presence channel
+
+  More info at: http://pusher.com/docs/rest_api#method-get-users
+  """
+  @spec users(binary) :: [user_id]
+  def users(channel) do
+    match = {{:p, :l, {:pusher, channel}}, :_, :'$1'}
+    :gproc.select([{match, [], [:'$1']}])
+    |> Enum.uniq(fn {user_id, _} -> user_id end)
+    |> Enum.map(fn {user_id, _} -> user_id end)
+  end
+
+  @doc """
+  Returns the number of unique users on a presence channel
+  """
+  @spec user_count(binary) :: non_neg_integer
+  def user_count(channel) do
+    match = {{:p, :l, {:pusher, channel}}, :_, :'$1'}
+    :gproc.select([{match, [], [:'$1']}])
+    |> Enum.uniq(fn {user_id, _} -> user_id end)
+    |> Enum.count
   end
 
   @doc """
@@ -75,8 +99,6 @@ defmodule Poxa.PresenceSubscription do
         else
           :gproc.update_shared_counter({:c, :l, {:presence, channel, user_id}}, -1)
         end
-      else
-        nil
       end
     end
     Enum.each(channel_user_id, member_remove_fun)
@@ -84,12 +106,10 @@ defmodule Poxa.PresenceSubscription do
   end
 
   @spec presence_channel?(any) :: boolean
-  def presence_channel?(<< "presence-", _presence_channel :: binary >> = _channel) do
+  def presence_channel?("presence-" <> _presence_channel  = _channel) do
     true
   end
-  def presence_channel?(_) do
-    false
-  end
+  def presence_channel?(_), do: false
 
   defp sanitize_user_id(user_id) do
     case JSEX.is_term?(user_id) do

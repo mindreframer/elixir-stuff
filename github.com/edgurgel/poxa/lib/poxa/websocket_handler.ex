@@ -32,12 +32,11 @@ defmodule Poxa.WebsocketHandler do
   end
 
   def handle_pusher_event(decoded_json, req, state) do
-    ListDict.get(decoded_json, "event")
-    |> handle_pusher_event(decoded_json, req, state)
+    handle_pusher_event(decoded_json["event"], decoded_json, req, state)
   end
 
   defp handle_pusher_event("pusher:subscribe", decoded_json, req, state) do
-    data = ListDict.get(decoded_json, "data")
+    data = decoded_json["data"]
     reply = case Subscription.subscribe!(data, state) do
       :ok -> PusherEvent.subscription_succeeded
       {:presence, channel, presence_data} -> PusherEvent.presence_subscription_succeeded(channel, presence_data)
@@ -46,8 +45,7 @@ defmodule Poxa.WebsocketHandler do
     {:reply, {:text, reply}, req, state}
   end
   defp handle_pusher_event("pusher:unsubscribe", decoded_json, req, state) do
-    :ok = ListDict.get(decoded_json, "data")
-      |> Subscription.unsubscribe!
+    :ok = Subscription.unsubscribe! decoded_json["data"]
     {:ok, req, state}
   end
   defp handle_pusher_event("pusher:ping", _decoded_json, req, state) do
@@ -55,7 +53,7 @@ defmodule Poxa.WebsocketHandler do
     {:reply, {:text, reply}, req, state}
   end
   # Client Events
-  defp handle_pusher_event(<<"client-", _event_name :: binary>> = _event, decoded_json, req, state) do
+  defp handle_pusher_event("client-" <> _event_name = _event, decoded_json, req, state) do
     {message, channels, _exclude} = PusherEvent.parse_channels(decoded_json)
     lc channel inlist channels, private_or_presence_channel(channel), Subscription.subscribed?(channel) do
       PusherEvent.send_message_to_channel(channel, message, [self])
@@ -69,8 +67,8 @@ defmodule Poxa.WebsocketHandler do
 
   defp private_or_presence_channel(channel) do
     case channel do
-      <<"presence-", _presence_channel :: binary>> -> true
-      <<"private-", _private_channel :: binary>> -> true
+      "presence-" <> _presence_channel -> true
+      "private-" <> _private_channel -> true
       _ -> false
     end
   end
@@ -89,7 +87,6 @@ defmodule Poxa.WebsocketHandler do
   end
 
   def websocket_info(info, req, state) do
-    Lager.debug('WS Unknown message: ~p', [info])
     {:ok, req, state}
   end
 

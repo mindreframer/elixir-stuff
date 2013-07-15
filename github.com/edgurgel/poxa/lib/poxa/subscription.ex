@@ -15,23 +15,21 @@ defmodule Poxa.Subscription do
   @spec subscribe!(:jsx.json_term, binary) :: :ok | {:presence, binary, {PresenceSubscription.user_id,
                                                                           :jsx.json_term}} | :error
   def subscribe!(data, socket_id) do
-    channel = ListDict.get(data, "channel")
+    channel = data["channel"]
     case channel do
-      <<"private-", _private_channel :: binary>> ->
-        auth = ListDict.get(data, "auth")
-        to_sign = case ListDict.get(data, "channel_data") do
+      "private-" <> _private_channel ->
+        to_sign = case data["channel_data"] do
           nil -> << socket_id :: binary, ":", channel :: binary >>
           channel_data -> << socket_id :: binary, ":", channel :: binary, ":", channel_data :: binary >>
         end
-        case AuthSignature.validate(to_sign, auth) do
+        case AuthSignature.validate(to_sign, data["auth"]) do
           :ok -> subscribe_channel(channel)
           :error -> subscribe_error(channel)
         end
-      <<"presence-", _presence_channel :: binary>> ->
-        auth = ListDict.get(data, "auth")
+      "presence-" <> _presence_channel ->
         channel_data = ListDict.get(data, "channel_data", "undefined")
         to_sign = <<socket_id :: binary, ":", channel ::binary, ":", channel_data :: binary>>
-        case AuthSignature.validate(to_sign, auth) do
+        case AuthSignature.validate(to_sign, data["auth"]) do
           :ok -> PresenceSubscription.subscribe!(channel, channel_data)
           :error -> subscribe_error(channel)
         end
@@ -63,7 +61,7 @@ defmodule Poxa.Subscription do
   """
   @spec unsubscribe!(:jsx.json_term) :: :ok
   def unsubscribe!(data) do
-    channel = ListDict.get(data, "channel")
+    channel = data["channel"]
     if PresenceSubscription.presence_channel?(channel) do
       PresenceSubscription.unsubscribe!(channel);
     end
@@ -89,6 +87,34 @@ defmodule Poxa.Subscription do
       [] -> false;
       _ -> true
     end
+  end
+
+  @doc """
+  Returns how many connections are opened on the `channel`
+  """
+  @spec subscription_count(binary) :: non_neg_integer
+  def subscription_count(channel) do
+    match = {{:p, :l, {:pusher, channel}}, :_, :_}
+    :gproc.select_count([{match, [], [true]}])
+  end
+
+  @doc """
+  Returns true if the channel has at least 1 subscription
+  """
+  @spec occupied?(binary) :: boolean
+  def occupied?(channel) do
+    match = {{:p, :l, {:pusher, channel}}, :_, :_}
+    :gproc.select(:all, [{match, [], [true]}], 1) != :'$end_of_table'
+  end
+
+  @doc """
+  Returns the list of channels with at least 1 subscription
+  """
+  @spec all_channels :: [binary]
+  def all_channels do
+    match = {{:p, :l, {:pusher, :'$1'}}, :_, :_}
+    :gproc.select([{match, [], [:'$1']}])
+    |> Enum.uniq
   end
 
 end
