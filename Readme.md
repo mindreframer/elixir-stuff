@@ -27,6 +27,10 @@ Articles:
   - http://devintorr.es/blog/2013/06/11/elixir-its-not-about-syntax/
 
 <!-- PROJECTS_LIST_START -->
+    artemeff/exredis:
+      Redis client for Elixir (work in progress)
+       14 commits, last change: 2013-07-14 20:58:36, 2 stars, 0 forks
+
     azukiapp/plowman:
       Alternative to Git Server for Openruko - Elixir/Erlang based
        37 commits, last change: , 2 stars, 0 forks
