@@ -13,7 +13,7 @@ Add to your mix.exs
 ```elixir
   defp deps do
     [
-      {:amrita, "0.1.1", github: "josephwilk/amrita"}
+      {:amrita, "0.1.4", github: "josephwilk/amrita"}
     ]
   end
 ```
@@ -31,11 +31,9 @@ Ensure you start Amrita in: test/test_helper.exs
 Amrita.start
 ```
 
-Create a new test file ending with "_test.exs".
-
-Require test_helper.exs in every test (this will ensure Amrita is started):
-
-Mix in `Amrita.Sweet` which will bring in everything you need to use Amrita:
+ * Test filenames must end with "_test.exs".
+ * Require test_helper.exs in every test (this will ensure Amrita is started):
+ * Mix in `Amrita.Sweet` which will bring in everything you need to use Amrita:
 
 ```elixir
 Code.require_file "../test_helper.exs", __FILE__
@@ -43,14 +41,50 @@ Code.require_file "../test_helper.exs", __FILE__
 defmodule ExampleFacts do
   use Amrita.Sweet
 
+  # Write some facts here
+
 end
 ```
 
 Now all thats left is to  write some tests!
 
+## Prerequisites / Mocks
+
+Amrita supports BDD style mocks.
+
+```elixir
+defmodule Polite do
+  def swear? do
+    false
+  end
+end
+
+defmodule Rude do
+  def swear?(word) do
+    true
+  end
+end
+
+fact "mocks must always be called for a pass",
+  provided: [Polite.swear?         |> true,
+             Rude.swear?("bugger") |> false] do
+
+  Polite.swear?           |> truthy
+  Rude.swear?("bugger")   |> falsey
+end
+
+#We can use a wildcard when we don't care about the exact value of a argument:
+
+fact "mock with a wildcard", provided: [Rude.swear?(_) |> false] do
+  Funk.swear?(:yes) |> falsey
+  Funk.swear?(:whatever) |> falsey
+end
+
+```
+
 ## Checkers
 
-Amrita is all about checkers!
+Amrita is all about checker based testing!
 
 ```elixir
 Code.require_file "../test_helper.exs", __FILE__
@@ -91,12 +125,20 @@ defmodule ExampleFacts do
       "I cannot explain myself for I am not myself" |> has_prefix "I"
     end
 
+    fact "has_prefix with a Set ignores the order" do
+      {1, 2, 3, 4} |> has_prefix Set.new([{2, 1}])
+    end
+
     fact "has_suffix checks if the end of a collection matches" do
       [1, 2, 3, 4 ,5] |> has_suffix [4, 5]
 
       {1, 2, 3, 4} |> has_suffix {3, 4}
 
       "I cannot explain myself for I am not myself" |> has_suffix "myself"
+    end
+
+    fact "has_suffix with a Set ignores the order" do
+      {1, 2, 3, 4} |> has_suffix Set.new([{4, 3}])
     end
 
     fact "for_all checks if a predicate holds for all elements" do
@@ -161,6 +203,12 @@ Use mix to run your tests:
 mix test
 ```
 
+Or if you want more details try with the Pretty formatter:
+
+```
+mix test --trace
+```
+
 ##Custom checkers
 
 Its simple to create your own checkers:
@@ -198,13 +246,24 @@ defmodule IDontLikeFacts do
 end
 ```
 
+## Amrita with Dynamo
+
+Checkout an example using Amrita with Dynamo: https://github.com/elixir-amrita/amrita_with_dynamo
+
 ## Amrita Development
 
 Hacking on Amrita.
 
 ###Running tests
 
+Amrita runs tests against Elixir's latest stable release and against Elixir master.
+Make is your friend for running these tests:
+
 ```
+#Run lastest stable and elixir master
+make ci
+
+#Run tests against your current Elixir install
 make
 ```
 

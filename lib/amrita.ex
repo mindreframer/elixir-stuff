@@ -7,37 +7,59 @@ defmodule Amrita do
   Start Amrita for a test run.
 
   This should be called in your test_helper.exs file.
+
+  Supports optional config:
+
+      # Use a custom formatter. Defaults to Progress formatter.
+      Amrita.start(formatter: Amrita.Formatter.Documentation)
+
   """
-  def start do
-    ExUnit.start formatter: Amrita.Formatter.Progress
+  def start(opts // []) do
+    formatter = Keyword.get(opts, :formatter, Amrita.Formatter.Progress)
+    ExUnit.start formatter: formatter
   end
 
   @doc """
-    Polite version of start.
+  Polite version of start.
   """
-  def please_start do
-    start
+  def please_start(opts // []) do
+    start(opts)
   end
 
   defmodule Sweet do
     @moduledoc """
     Responsible for loading Amrita within a test module.
 
+    ## Example:
         defmodule TestsAboutSomething do
           use Amrita.Sweet
         end
     """
 
     @doc false
-    defmacro __using__(_ // []) do
+    defmacro __using__(opts // []) do
+      async = Keyword.get(opts, :async, false)
       quote do
-        use ExUnit.Case
-        import Amrita.Facts
+        if !Enum.any?(__ENV__.requires, fn(x) -> x == ExUnit.Case end) do
+          use ExUnit.Case, async: unquote(async)
+        end
+
+        import ExUnit.Callbacks
+        import ExUnit.Assertions
+        import ExUnit.Case
+        @ex_unit_case true
+
+        import Kernel, except: [|>: 2]
+        import Amrita.Elixir.Pipeline
+
+        use Amrita.Facts
+        use Amrita.Mocks
         import Amrita.Describes
 
         import Amrita.Checkers.Simple
         import Amrita.Checkers.Collection
         import Amrita.Checkers.Exceptions
+        import Amrita.Checkers.Messages
       end
     end
   end
@@ -67,6 +89,14 @@ defmodule Amrita do
     Express facts about your code.
     """
 
+    @doc false
+    defmacro __using__(_) do
+      quote do
+        @name_stack []
+        import Amrita.Facts
+      end
+    end
+
     @doc """
     A fact is the container of your test logic.
 
@@ -74,11 +104,31 @@ defmodule Amrita do
         fact "about addition" do
           ...
         end
+
+    If you are using mocks you can define them as part of your fact.
+
+    ## Example
+        fact "about mock", provided: [Flip.flop(:ok) |> true] do
+          Flip.flop(:ok) |> truthy
+        end
+
     """
-    defmacro fact(description, _ // quote(do: _), contents) do
-      quote do
-        test Enum.join((@name_stack || []), "") <> unquote(description) do
-          unquote(contents)
+    defmacro fact(description, provided // [], _meta // quote(do: _), contents) do
+      if is_list(provided) && !Enum.empty?(provided) do
+        {:provided, mocks} = Enum.at(provided, 0)
+
+        quote do
+          test Enum.join(@name_stack, "") <> unquote(description) do
+            provided unquote(mocks) do
+              unquote(contents)
+            end
+          end
+        end
+      else
+        quote do
+          test Enum.join(@name_stack, "") <> unquote(description) do
+            unquote(contents)
+          end
         end
       end
     end
@@ -93,7 +143,9 @@ defmodule Amrita do
     """
     defmacro fact(description) do
       quote do
-        Amrita.Message.pending "Future fact: " <> Enum.join((@name_stack || []), "") <> unquote(description)
+        test unquote(description) do
+          Amrita.Message.pending Enum.join(@name_stack, "") <> unquote(description)
+        end
       end
     end
 
@@ -108,7 +160,9 @@ defmodule Amrita do
     """
     defmacro future_fact(description, _ // quote(do: _), _) do
       quote do
-        Amrita.Message.pending "Future fact: " <> Enum.join((@name_stack || []), "") <>  unquote(description)
+        test unquote(description) do
+          Amrita.Message.pending Enum.join(@name_stack, "") <>  unquote(description)
+        end
       end
     end
 
@@ -125,7 +179,7 @@ defmodule Amrita do
     """
     defmacro facts(description, _ // quote(do: _), contents) do
       quote do
-        @name_stack List.concat((@name_stack || []), [unquote(description) <> ": "])
+        @name_stack List.concat(@name_stack, [unquote(description) <> ": "])
         unquote(contents)
         if Enum.count(@name_stack) > 0 do
           @name_stack Enum.take(@name_stack, Enum.count(@name_stack) - 1)
@@ -148,34 +202,54 @@ defmodule Amrita do
                               predicate: checker
     end
 
+    def mock_fail(errors) do
+      raise Amrita.MockError, errors: errors
+    end
+
     def pending(message) do
-      IO.puts IO.ANSI.escape("%{yellow}" <>  message)
+      raise Amrita.FactPending, message: message
     end
   end
 
   defmodule Checker do
     @moduledoc false
 
-    def to_s({function_name, arity}, args) do
+    def to_s(module, fun, args) do
+      to_s "#{inspect(module)}.#{fun}", args
+    end
+
+    def to_s({function_name, _arity}, args) do
       to_s(function_name, args)
     end
 
-    def to_s(function_name, args) do
-      if args do
-        "#{function_name}(#{inspect(args)})"
-      else
-        "#{function_name})"
-      end
+    def to_s(function_name, args) when is_bitstring(args) do
+      "#{function_name}(#{args})"
+    end
+
+    def to_s(function_name, args) when is_list(args) do
+      str_args = Enum.map args, fn a -> inspect(a) end
+      "#{function_name}(#{Enum.join(str_args, ",")})"
+    end
+
+    def to_s(function_name, args) when args do
+      "#{function_name}(#{inspect(args)})"
+    end
+
+    def to_s(function_name, _) do
+      "#{function_name}"
     end
   end
 
   defmodule Checkers.Exceptions do
 
     @doc """
-    Checks if an exception was raised and that it was of the expected type
+    Checks if an exception was raised and that it was of the expected type or matches the
+    expected message.
 
     ## Example
         fn -> raise Exception end |> raises Exception ; true
+        fn -> raise "Jolly jolly gosh" end |> raises %r"j(\w)+y" ; true
+
         fn -> true end            |> raises Exception ; false
     """
     def raises(function, expected_exception) when is_function(function) do
@@ -186,12 +260,31 @@ defmodule Amrita do
         error in [expected_exception] -> error
         error ->
           name = error.__record__(:name)
-          if name in [ExUnit.AssertionError, ExUnit.ExpectationError, Amrita.FactError] do
+
+          if name in [ExUnit.AssertionError, ExUnit.ExpectationError, Amrita.FactError, Amrita.MockError] do
             raise(error)
           else
-            Message.fail name, expected_exception, __ENV__.function
+            failed_exception_match(error, expected_exception)
           end
       end
+    end
+
+    defp failed_exception_match(error, expected) when is_bitstring(expected) do
+      message = error.message
+      if not(String.contains?(expected, message)) do
+        Message.fail message, expected, __ENV__.function
+      end
+    end
+
+    defp failed_exception_match(error, expected) when is_regex(expected) do
+      message = error.message
+      if not(Regex.match?(expected, message)) do
+        Message.fail message, expected, __ENV__.function
+      end
+    end
+
+    defp failed_exception_match(error, expected) do
+      Message.fail error.__record__(:name), expected, __ENV__.function
     end
 
     @doc false
@@ -209,7 +302,7 @@ defmodule Amrita do
     """
 
     @doc """
-    Check if actual is odd
+    Check if actual is odd.
 
     ## Example
         2 |> even ; true
@@ -218,11 +311,11 @@ defmodule Amrita do
     def odd(number) when is_integer(number) do
       r = rem(number, 2) == 1
 
-      if (not r), do: Message.fail number, __ENV__.function
+      if not(r), do: Message.fail(number, __ENV__.function)
     end
 
     @doc """
-    Check if actual is even
+    Check if actual is even.
 
     ## Example
         2 |> even ; true
@@ -230,11 +323,11 @@ defmodule Amrita do
     def even(number) when is_integer(number) do
       r = rem(number, 2) == 0
 
-      if (not r), do: Message.fail number, __ENV__.function
+      if not(r), do: Message.fail(number, __ENV__.function)
     end
 
     @doc """
-    Check if `actual` evaluates to precisely true
+    Check if `actual` evaluates to precisely true.
 
     ## Example
         "mercury" |> truthy ; true
@@ -247,7 +340,7 @@ defmodule Amrita do
         r = false
       end
 
-      if (not r), do: Message.fail actual, __ENV__.function
+      if not(r), do: Message.fail(actual, __ENV__.function)
     end
 
     @doc """
@@ -264,7 +357,7 @@ defmodule Amrita do
         r = true
       end
 
-      if (not r), do: Message.fail actual, __ENV__.function
+      if not(r), do: Message.fail(actual, __ENV__.function)
     end
 
     @doc """
@@ -277,7 +370,7 @@ defmodule Amrita do
     def roughly(actual, expected, delta) do
       r = (expected >= (actual - delta)) and (expected <= (actual + delta))
 
-      if (not r), do: Message.fail actual, expected, __ENV__.function
+      if not(r), do: Message.fail(actual, "#{expected} +-#{delta}", __ENV__.function)
     end
 
     @doc """
@@ -300,7 +393,7 @@ defmodule Amrita do
     end
 
     @doc """
-    Checks if actual == expected
+    Checks if actual == expected.
 
     ## Example
         1000 |> equals 1000 ; true
@@ -309,7 +402,7 @@ defmodule Amrita do
     def equals(actual, expected) do
       r = (actual == expected)
 
-      if (not r), do: Message.fail actual, expected, __ENV__.function
+      if (not r), do: Message.fail(actual, expected, __ENV__.function)
     end
 
     @doc false
@@ -329,26 +422,53 @@ defmodule Amrita do
         [1, 2, 3, 4] |> ! contains 4   ; false
 
     """
-    def :!.(actual, checker) do
+    def :!.(actual, checker) when is_function(checker) do
       r = try do
         checker.(actual)
       rescue
-        error in [Amrita.FactError, ExUnit.AssertionError] -> false
+        error in [Amrita.FactError, Amrita.MockError, ExUnit.AssertionError] -> false
         error -> raise(error)
       end
 
-      if r, do: Message.fail actual, r, __ENV__.function
+      if r, do: Message.fail(actual, r, __ENV__.function)
     end
 
+    def :!.(actual, value) do
+      value |> ! equals actual
+    end
+  end
+
+  defmodule Checkers.Messages do
+    @moduledoc """
+    Checkers which ease the work with messages.
+    """
+
+    @doc """
+    Returns the received message with parameters.
+
+    ## Examples
+        self <- :hello
+        received |> :hello
+
+    """
+    def received do
+      timeout = 0
+      receive do
+        other -> other
+      after
+        timeout ->
+          Message.fail("Expected to have received message", __ENV__.function)
+      end
+    end
   end
 
   defmodule Checkers.Collection do
     @moduledoc """
-    Checkers which are designed to work with collections (lists, tuples, keyword lists, strings)
+    Checkers which are designed to work with collections (lists, tuples, keyword lists, strings).
     """
 
     @doc """
-    Checks that the collection contains element:
+    Checks that the collection contains element.
 
     ## Examples
         [1, 2, 3] |> contains 3
@@ -364,10 +484,10 @@ defmodule Amrita do
             c when is_tuple(c)           -> element in tuple_to_list(c)
             c when is_list(c)            -> element in c
             c when is_regex(element)     -> Regex.match?(element, c)
-            c when is_bitstring(element) -> string_match?(element, c)
+            c when is_bitstring(element) -> String.contains?(c, element)
           end
 
-      if (not r), do: Message.fail collection, element, __ENV__.function
+      if (not r), do: Message.fail(collection, element, __ENV__.function)
     end
 
     @doc false
@@ -378,16 +498,8 @@ defmodule Amrita do
       end
     end
 
-    @doc false
-    defp string_match?(element, string) do
-      case :binary.matches(string, element) do
-        [_] -> true
-        []  -> false
-      end
-    end
-
     @doc """
-    Checks that the actual result starts with the expected result:
+    Checks that the actual result starts with the expected result.
 
     ## Examples
         [1 2 3] |> has_prefix  [1 2]   ; true
@@ -398,6 +510,14 @@ defmodule Amrita do
         "I cannot explain myself for I am not myself" |> has_prefix "I"
 
     """
+    def has_prefix(collection, prefix) when is_list(collection) and is_record(prefix, Amrita.Set) do
+      collection_prefix = Enum.take(collection, Enum.count(prefix))
+
+      r = fail_fast_contains?(collection_prefix, prefix)
+
+      if not(r), do: Message.fail(prefix, collection, __ENV__.function)
+    end
+
     def has_prefix(collection, prefix) do
       r = case collection do
             c when is_tuple(c) ->
@@ -410,7 +530,7 @@ defmodule Amrita do
               String.starts_with?(collection, prefix)
           end
 
-      if (not r), do: Message.fail prefix, collection, __ENV__.function
+      if not(r), do: Message.fail(prefix, collection, __ENV__.function)
     end
 
     @doc false
@@ -422,7 +542,7 @@ defmodule Amrita do
     end
 
     @doc """
-    Checks that the actual result ends with the expected result:
+    Checks that the actual result ends with the expected result.
 
     ## Examples:
         [1 2 3] |> has_suffix [2 3]  ; true
@@ -433,6 +553,14 @@ defmodule Amrita do
         "I cannot explain myself for I am not myself" |> has_suffix "myself"
 
     """
+    def has_suffix(collection, suffix) when is_list(collection) and is_record(suffix, Amrita.Set) do
+      collection_suffix = Enum.drop(collection, Enum.count(collection) - Enum.count(suffix))
+
+      r = fail_fast_contains?(collection_suffix, suffix)
+
+      if not(r), do: Message.fail(suffix, collection, __ENV__.function)
+    end
+
     def has_suffix(collection, suffix) do
       r = case collection do
             c when is_tuple(c) ->
@@ -442,11 +570,11 @@ defmodule Amrita do
             c when is_list(c) ->
               collection_suffix = Enum.drop(collection, Enum.count(collection) - Enum.count(suffix))
               collection_suffix == suffix
-            c when is_bitstring(suffix) ->
+            _ when is_bitstring(suffix) ->
               String.ends_with?(collection, suffix)
           end
 
-      if (not r), do: Message.fail suffix, collection, __ENV__.function
+      if not(r), do: Message.fail(suffix, collection, __ENV__.function)
     end
 
     @doc false
@@ -458,18 +586,47 @@ defmodule Amrita do
     end
 
     @doc """
-    Checks whether a predicate holds for all elements in a collection
+    Checks whether a predicate holds for all elements in a collection.
 
     ## Examples:
         [1, 3, 5, 7] |> for_all odd(&1)  ; true
         [2, 3, 5, 7] |> for_all odd(&1)  ; false
     """
     def for_all(collection, fun) do
-      Enum.all?(collection, fun)
+      Enum.each(collection, fun)
     end
 
-    @doc false
+    @doc """
+    Checks whether a predicate holds for at least one element in a collection.
+
+    ## Examples:
+        [2, 4, 7, 8] |> for_some odd(&1) ; true
+        [2, 4, 6, 8] |> for_some odd(&1) ; false
+    """
     def for_some(collection, fun) do
+     r = Enum.any?(Enum.map(collection, (fn value ->
+        try do
+          fun.(value)
+          true
+        rescue
+          [Amrita.FactError, Amrita.MockError, ExUnit.AssertionError] -> false
+        end
+      end)))
+
+      if not(r), do: Message.fail(fun, collection, __ENV__.function)
+    end
+
+    defp fail_fast_contains?(collection1, collection2) do
+      try do
+        Enum.reduce(collection1, true, fn(value, acc) ->
+          case value in collection2 do
+            true -> acc
+            _    -> throw(:error)
+          end
+        end)
+      catch
+        :error -> false
+      end
     end
 
   end

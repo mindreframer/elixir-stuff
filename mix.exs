@@ -3,11 +3,17 @@ defmodule Amrita.Mixfile do
 
   def project do
     [app: :amrita,
-     version: "0.1.1",
+     version: version,
      name: "Amrita",
      source_url: "https://github.com/josephwilk/amrita",
      homepage_url: "http://amrita.io",
+     env: [test: [deps: deps],
+           dev:  [deps: deps ++ dev_deps]],
      deps: deps]
+  end
+
+  def version do
+    String.strip(File.read!("VERSION"))
   end
 
   def application do
@@ -15,6 +21,10 @@ defmodule Amrita.Mixfile do
   end
 
   defp deps do
-    [{ :ex_doc, github: "elixir-lang/ex_doc" }]
+    [{:meck, "0.7.2", [github: "eproxus/meck"]}]
+  end
+
+  defp dev_deps do
+    [{:ex_doc, github: "elixir-lang/ex_doc"}]
   end
 end

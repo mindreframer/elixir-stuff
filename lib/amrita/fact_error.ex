@@ -1,5 +1,3 @@
-defexception Amrita.FactError, message: "fact failed"
-
 defexception Amrita.FactError,
                     expected: nil,
                     actual: nil,
@@ -7,9 +5,13 @@ defexception Amrita.FactError,
                     negation: false,
                     prelude: "Expected" do
 
+  def message do
+    "fact failed"
+  end
+
   def message(exception) do
     "#{exception.prelude}:\n" <>
-    "     #{exception.actual_result} |> #{exception.full_checker}"
+      "     #{exception.actual_result} |> #{exception.full_checker}"
   end
 
   def full_checker(exception) do
