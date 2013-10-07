@@ -20,3 +20,4 @@ https://github.com/talentdeficit/jsex.git
 https://github.com/yrashk/genx.git
 https://github.com/elixir-lang/ecto.git
 https://github.com/chrismccord/atlas.git
+https://github.com/bruce/vex.git
