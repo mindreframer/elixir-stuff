@@ -45,6 +45,14 @@ Articles:
       An Elixir module to retrieve Yahoo Finance quotes
        19 commits, last change: 2013-07-04 15:44:38, 3 stars, 0 forks
 
+    bruce/vex:
+      Data Validation for Elixir
+       49 commits, last change: 2013-09-12 23:39:28, 23 stars, 1 forks
+
+    chrismccord/atlas:
+      Object Relational Mapper for Elixir
+       79 commits, last change: 2013-09-15 18:32:44, 51 stars, 1 forks
+
     edgurgel/octokit.ex:
       Simple Elixir wrapper for the GitHub API
        47 commits, last change: 2013-07-11 15:38:50, 6 stars, 2 forks
@@ -64,6 +72,10 @@ Articles:
     elixir-lang/dynamo:
       Run, Dynamo, Run!
        490 commits, last change: 2013-07-12 03:54:09, 331 stars, 62 forks
+
+    elixir-lang/ecto:
+      A database wrapper and language integrated query for Elixir
+       257 commits, last change: 2013-10-07 13:30:07, 143 stars, 13 forks
 
     jeremyjh/nested:
       Functions for manipulating nested hierarchies in Elixir - inspired by Clojure's assoc-in/update-in functions.
