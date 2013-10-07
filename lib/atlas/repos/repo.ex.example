@@ -1,0 +1,36 @@
+defmodule Repo do
+  use Atlas.Repo, adapter: Atlas.Adapters.Postgres
+
+  def config(:dev) do
+    [
+      database: "",
+      username: "",
+      password: "",
+      host: "",
+      pool: 5,
+      log_level: :debug
+    ]
+  end
+
+  def config(:test) do
+    [
+      database: "",
+      username: "",
+      password: "",
+      host: "",
+      pool: 5,
+      log_level: :debug
+    ]
+  end
+
+  def config(:prod) do
+    [
+      database: "",
+      username: "",
+      password: "",
+      host: "",
+      pool: 5,
+      log_level: :warn
+    ]
+  end
+end
