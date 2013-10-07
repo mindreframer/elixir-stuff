@@ -2,11 +2,14 @@ https://github.com/artemeff/exredis.git
 https://github.com/azukiapp/plowman.git
 https://github.com/baldmountain/elixir_csv.git
 https://github.com/baldmountain/yahoo_finance.git
+https://github.com/bruce/vex.git
+https://github.com/chrismccord/atlas.git
 https://github.com/edgurgel/octokit.ex.git
 https://github.com/edgurgel/poxa.git
 https://github.com/ekosz/bitcoin_arbitrage.git
 https://github.com/ekosz/stock_server.git
 https://github.com/elixir-lang/dynamo.git
+https://github.com/elixir-lang/ecto.git
 https://github.com/jeremyjh/nested.git
 https://github.com/josephwilk/amrita.git
 https://github.com/meh/elixir-datastructures.git
@@ -18,6 +21,3 @@ https://github.com/sasa1977/exactor.git
 https://github.com/sasa1977/workex.git
 https://github.com/talentdeficit/jsex.git
 https://github.com/yrashk/genx.git
-https://github.com/elixir-lang/ecto.git
-https://github.com/chrismccord/atlas.git
-https://github.com/bruce/vex.git
