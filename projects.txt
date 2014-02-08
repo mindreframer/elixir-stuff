@@ -21,3 +21,4 @@ https://github.com/sasa1977/exactor.git
 https://github.com/sasa1977/workex.git
 https://github.com/talentdeficit/jsex.git
 https://github.com/yrashk/genx.git
+https://github.com/seven1m/30-days-of-elixir.git
